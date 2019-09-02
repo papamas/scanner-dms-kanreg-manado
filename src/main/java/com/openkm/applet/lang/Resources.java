@@ -30,7 +30,10 @@ public class Resources extends ListResourceBundle {
 			{ "file.name", "File Name" }, 
 			{ "file.type", "File Type" },
 			{ "user.interface", "User Interface"},
-			{ "scan.upload", "Scan & Upload"}
+			{ "scan.upload", "Scan & Upload"},
+                        { "doc.type", "Jenis Dokumen"},
+                        { "doc.name", "Nama Dokumen"},
+                        { "select.scan", "Select Scanner"}
 		};
 	}
 }

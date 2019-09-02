@@ -84,8 +84,12 @@ public class ScannerManager implements ScannerListener {
 	/**
 	 *
 	 */
-	public void acquire(String fileName, String fileType, boolean ui, JButton bScan, JTextField tfFileName,
-			JComboBox cbFileType, JCheckBox cbUI) throws ScannerIOException {
+	public void acquire(String fileName,
+                String fileType, boolean ui,
+                JButton bScan,
+                JTextField tfFileName,
+                JComboBox cbFileType, 
+                JCheckBox cbUI) throws ScannerIOException {
 		log.fine("########## adquire ########## " + fileName + " -> " + fileType);
 		this.bScan = bScan;
 		this.tfFileName = tfFileName;
