@@ -33,7 +33,8 @@ public class Resources extends ListResourceBundle {
 			{ "scan.upload", "Scan & Upload"},
                         { "doc.type", "Jenis Dokumen"},
                         { "doc.name", "Nama Dokumen"},
-                        { "select.scan", "Select Scanner"}
+                        { "select.scan", "Select Scanner"},
+                        { "set.scan", "Setting Scanner"}
 		};
 	}
 }

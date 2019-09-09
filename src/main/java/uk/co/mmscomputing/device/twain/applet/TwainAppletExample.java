@@ -103,16 +103,15 @@ public class TwainAppletExample extends Applet implements ActionListener, Scanne
       }
     }else if(type.equals(ScannerIOMetadata.NEGOTIATE)){
       ScannerDevice device=metadata.getDevice();
-/*
       try{
         device.setShowUserInterface(true);
-        device.setShowProgressBar(true);
-        device.setRegionOfInterest(0,0,210.0,300.0);
-        device.setResolution(100);
+        //device.setShowProgressBar(true);
+        //device.setRegionOfInterest(0,0,210.0,300.0);
+        //device.setResolution(100);
       }catch(Exception e){
         e.printStackTrace();
       }
-*/
+
     }else if(type.equals(ScannerIOMetadata.STATECHANGE)){
       System.err.println(metadata.getStateStr());
     }else if(type.equals(ScannerIOMetadata.EXCEPTION)){

@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -43,6 +42,9 @@ import uk.co.mmscomputing.device.scanner.ScannerIOMetadata;
 import uk.co.mmscomputing.device.scanner.ScannerIOMetadata.Type;
 import uk.co.mmscomputing.device.scanner.ScannerListener;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 public class ScannerManager implements ScannerListener {
 	private static Logger log = Logger.getLogger(ScannerManager.class.getName());
 	private String token;
@@ -52,65 +54,70 @@ public class ScannerManager implements ScannerListener {
 	private Scanner scanner;
 	private String fileName;
 	private String fileType;
-	private boolean ui;
-	private JButton bScan;
-	private JTextField tfFileName;
+	private JButton bScan,bSelectScan,bSetScan;
+        private JTextField tfFileName;
 	private JComboBox cbFileType;
-	private JCheckBox cbUI;
 	private List<BufferedImage> images;
+        private boolean ui;
 
 	/**
 	 * @param token
 	 * @param win
 	 */
-	public ScannerManager(String token, String path, String url, JSObject win) {
+	public ScannerManager(String token,
+                String path,
+                String url,
+                JSObject win) throws ScannerIOException {
 		log.info("########## ScannerManager ##########");
 		this.token = token;
 		this.path = path;
 		this.url = url;
 		this.win = win;
-		scanner = Scanner.getDevice();
-		scanner.addListener(this);
 		images = new ArrayList<BufferedImage>();
+                scanner=Scanner.getDevice();
+                scanner.addListener(this);
+               
 	}
-
-	/**
-	 *
-	 */
-	public Scanner getDevice() {
-		return scanner;
-	}
-
-	/**
-	 *
-	 */
-	public void acquire(String fileName,
-                String fileType, boolean ui,
+	      
+     	public void acquire(String fileName,
+                String fileType,
+                boolean ui,
                 JButton bScan,
+                JButton bSelectScan,
+                JButton bSetScan,
                 JTextField tfFileName,
-                JComboBox cbFileType, 
-                JCheckBox cbUI) throws ScannerIOException {
-		log.fine("########## adquire ########## " + fileName + " -> " + fileType);
+                JComboBox cbFileType) {
+		
+                log.fine("########## acquire ########## " + fileName + " -> " + fileType);
 		this.bScan = bScan;
+                this.bSelectScan = bSelectScan;
+                this.bSetScan = bSetScan;
 		this.tfFileName = tfFileName;
 		this.cbFileType = cbFileType;
-		this.cbUI = cbUI;
 		this.fileName = fileName;
 		this.fileType = fileType;
-		this.ui = ui;
 		bScan.setEnabled(false);
+                bSelectScan.setEnabled(false);
+                bSetScan.setEnabled(false);
 		tfFileName.setEnabled(false);
 		cbFileType.setEnabled(false);
-		cbUI.setEnabled(false);
-		scanner.acquire();
+                this.ui = ui;
+                
+            try {
+                scanner.acquire();               
+            } catch (ScannerIOException ex) {
+                Logger.getLogger(ScannerManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
 	}
 
 	public void setPath(String path) {
-		this.path = path;
+            this.path = path;
 	}
 
 	@Override
 	public void update(Type type, ScannerIOMetadata metadata) {
+            
+               System.out.println("update");
 		if (type.equals(ScannerIOMetadata.ACQUIRED)) {
 			log.info("***** ACQUIRED *****");
 			images.add(metadata.getImage());
@@ -119,15 +126,30 @@ public class ScannerManager implements ScannerListener {
 			
 			if (metadata.getLastState() == 7 && metadata.getState() == 5) {
 				try {
-					String response = Util.createDocument(token, path, fileName, fileType, url, images);
-					
-					if (!response.startsWith("OKM_OK")) {
-						log.log(Level.SEVERE, "Error: " + response);
-						ErrorCode.displayError(response, path + "/" + fileName + "." + fileType);
+					String response = Util.createDocument(token, 
+                                                path,
+                                                fileName,
+                                                fileType, 
+                                                url,
+                                                images);
+                                        
+                                        log.info("=== Response Create Document===" + response);
+                                        
+                                        JSONParser parser = new JSONParser();
+                                        JSONObject jsonObject = (JSONObject) parser.parse(response);
+                                        String error = (String) jsonObject.get("error");
+                                        					
+					if (response.contains("OKM")) {
+					    log.log(Level.SEVERE, "Error: " + response);
+					    ErrorCode.displayError(error, path + "/" + fileName + "." + fileType);
+                                            
+                                            
 					}
 					
 					images.clear();
-					win.call("refreshFolder", null);
+					win.call("refreshFolderFix", null);
+                                     
+                                
 				} catch (JSException e) {
 					log.log(Level.WARNING, "JSException: " + e.getMessage(), e);
 					
@@ -146,9 +168,11 @@ public class ScannerManager implements ScannerListener {
 			
 			if (metadata.isFinished()) {
 				bScan.setEnabled(true);
+                                bSelectScan.setEnabled(true);
+                                bSetScan.setEnabled(true);
 				tfFileName.setEnabled(true);
 				cbFileType.setEnabled(true);
-				cbUI.setEnabled(true);
+				
 			}
 		} else if (type.equals(ScannerIOMetadata.NEGOTIATE)) {
 			log.info("***** NEGOTIATE *****");
@@ -156,9 +180,9 @@ public class ScannerManager implements ScannerListener {
 
 			try {
 				device.setShowUserInterface(ui);
-				device.setShowProgressBar(true);
-				// device.setResolution(300);
-				// device.setOption("mode", "Color");
+			        //device.setShowProgressBar(true);
+				//device.setResolution(150);
+                                //device.setOption("mode", "Color");
 				// device.setOption("br-x", 215);
 				// device.setOption("br-y", 297.0);
 
@@ -187,4 +211,13 @@ public class ScannerManager implements ScannerListener {
 			log.finer("update(" + type + ", " + metadata + ")");
 		}
 	}
+
+   
+
+    void selectScan() throws ScannerIOException {
+        log.info("***** CALL SELECT SCANNER *****");
+        scanner.select();
+    }
+
+    
 }

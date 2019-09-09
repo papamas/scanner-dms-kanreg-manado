@@ -77,6 +77,7 @@ public class Util {
 			
 			if (token != null) {
 				// Send image
+                                log.info("===Send image====");
 				HttpClient client = new DefaultHttpClient();
 				MultipartEntity form = new MultipartEntity();
 				form.addPart("file", new FileBody(tmpFile));

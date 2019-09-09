@@ -34,9 +34,9 @@ public class TwainExample implements ScannerListener{
     }else if(type.equals(ScannerIOMetadata.NEGOTIATE)){
       ScannerDevice device=metadata.getDevice();
       try{
-//        device.setShowUserInterface(true);
-//        device.setShowProgressBar(true);
-//        device.setResolution(100);
+        device.setShowUserInterface(true);
+        device.setShowProgressBar(true);
+        device.setResolution(100);
       }catch(Exception e){
         e.printStackTrace();
       }

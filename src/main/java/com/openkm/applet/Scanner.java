@@ -22,6 +22,7 @@
 package com.openkm.applet;
 
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -31,6 +32,7 @@ import javax.swing.SwingUtilities;
 
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
+import uk.co.mmscomputing.device.scanner.ScannerIOException;
 
 /**
  * JSObject documentation:
@@ -61,12 +63,13 @@ public class Scanner extends JApplet {
        		url = getCodeBase().toString();
        		url = url.substring(0, url.length()-1);
        		url = url.substring(0, url.lastIndexOf('/'));
-       		token = getParameter("token");
+       		token = getParameter("sessionId");
        		path = getParameter("path");
        		lang = getParameter("lang");
        		locale = Util.parseLocaleString(lang);
        		Messages.init(locale);
-        	win = JSObject.getWindow(this);        	
+        	win = JSObject.getWindow(this);    
+                
         } catch (JSException e) {
         	log.warning("Can't access JSObject object");
         }
@@ -79,8 +82,13 @@ public class Scanner extends JApplet {
     	log.info("applet.url => "+url);
     	log.info("applet.jsobject => "+win);
 
-        // Create scanner instance
-        app = new ScannerManager(token, path, url, win);
+            try {
+                log.info("============Create scanner instance=================== "); 
+               // Create scanner instance
+                app = new ScannerManager(token, path, url, win);                
+            } catch (ScannerIOException ex) {
+                Logger.getLogger(Scanner.class.getName()).log(Level.SEVERE, null, ex);
+            }
 		
 		try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -97,8 +105,9 @@ public class Scanner extends JApplet {
 	 * 
 	 */
 	private void createGUI() {
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		
 		JFrame main = new MainFrame(app, win);
+                JFrame.setDefaultLookAndFeelDecorated(true);
 		main.setVisible(true);
 		main.setResizable(false);
 		main.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

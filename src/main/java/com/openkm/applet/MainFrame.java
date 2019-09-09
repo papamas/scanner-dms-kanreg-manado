@@ -31,19 +31,18 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import netscape.javascript.JSObject;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import uk.co.mmscomputing.device.scanner.ScannerIOException;
+import uk.co.mmscomputing.device.scanner.ScannerIOMetadata;
 
 public class MainFrame extends JFrame implements ActionListener, WindowListener {
 	private static Logger log = Logger.getLogger(MainFrame.class.getName());
@@ -57,7 +56,9 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	private ScannerManager scanner;
 	private JSObject win;
         private JButton bSelectScan;
+        private JButton bSetScan;
 
+        private ScannerIOMetadata metadata;
 	/**
 	 * Auto-generated main method to display this JFrame
 	 */
@@ -123,104 +124,16 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 			getContentPane().add(tfFileName);
 			tfFileName.setBounds(125, 15, 190, 22);
 			
-                        
-                        DefaultComboBoxModel DocTypeModel = new DefaultComboBoxModel();
-                        JComboBox<String> comboBox = new JComboBox<>(DocTypeModel);
-                        comboBox.setSelectedIndex(-1);
-                        comboBox.setEditable(true);
                        
-                        
-
-
-                        DocTypeModel.addElement(new DocTypeModel("1","1. Kartu Pendaftaran Ulang PNS (KARDAF) Tahun 1974"));	
-                        DocTypeModel.addElement(new DocTypeModel("2","2. Data Kepegawaian Perorangan (DKP)"));
-                        DocTypeModel.addElement(new DocTypeModel("3","3. Nota Persetujuan/Penetapan NIP)"));
-                        DocTypeModel.addElement(new DocTypeModel("4","4. Surat Keputusan Pengangkatan sebagai Calon PNS"));
-                        DocTypeModel.addElement(new DocTypeModel("5","5. Surat Perintah Melaksanakan Tugas (SPMT)"));
-                        DocTypeModel.addElement(new DocTypeModel("6","6. Surat Tanda Tamat Pendidikan dan Pelatihan"));
-                        DocTypeModel.addElement(new DocTypeModel("7","7. Berita Acara Pengangkatan Sumpah dan Janji PNS"));
-                        DocTypeModel.addElement(new DocTypeModel("8","8. Surat Keputusan Pengangkatan sebagai PNS"));
-                        
-                        
-                        /*
-			new String[] { 
-                             "",
-                            "",
-                            "",
-                            "",
-                            "9. Nota Persetujuan Kenaikan Pangkat",
-                            "10. Nota Persetujuan Mutasi Lain-Lain",
-                            "11. SK Kenaikan Pangkat PNS",
-                            "12. SK Mutasi lain-lain PNSS",
-                            "13. Penetapan Angka Kredit",
-                            "14. Berita Acara Pelantikan dalam Jabatan",
-                            "15. SK Pengangkatan, Pemindahan, dan Pemberhentian  Jabatan",
-                            "16. Surat Pernyataan Menduduki Jabatan",
-                            "17. SK Pindah Wilayah Kerja",
-                            "18. Nota Persetujuan Perpindahan Antar Instansi",
-                            "19. Surat Keputusan Pindah Antar lnstansi diterbitkan Instansi",
-                            "20. Nota Persetujuan Peninjauan Masa Kerja",
-                            "21. SK Peninjauan Masa Kerja diterbitkan Instansi",
-                            "22. Nota Persetujuan CLTN",
-                            "23. Surat Keputusan  CLTN",
-                            "24. Nota Persetujuan Pengaktifan Kernbali Setelah CLTN",
-                            "25. Surat Keputusan Pengaktifan Kembali Setelah CLTN",
-                            "26. Nota Persetujuan Perbantuan pada Instansi Lain",
-                            "27. SK Perbantuan kepada Instansi Lain",
-                            "28. SK Penarikan dari Perbantuan",
-                            "29. SK Diperkerjakan pada Instansi Lain",
-                            "30. SK Penarikan dari Diperkerjakan",
-                            "31. SK Hukuman Disiplin",
-                            "32. SK Pengangkatan Kembali sebagai Pejabat Negara",
-                            "33. SK Pembebasan dari Jabatan Organik",
-                            "34. SK Pemberhentian Sementara",
-                            "35. SK Pengaktifan Kembali dari Pernberhentian Sementara",
-                            "36. Laporan Pegawai yang hilang",
-                            "37. Laporan Kembalinya PNS yang hilang",
-                            "38. Surat Keputusan Pemberian Uang Tunggu",
-                            "39. Surat Keputusan Penggantian/Perubahan nama",
-                            "40. Surat Keputusan Penetapan Tanggal Lahir",
-                            "41. Tanda Lulus Mengikuti Pendidikan Kedinasan",
-                            "42. Tanda Lulus Mengikuti Pendidikan dan Pelatihan/Penataran",
-                            "43. Surat Keputusan Tugas Belajar Pendidikan Umum",
-                            "44. Surat Tanda Lulus/ Ijazah Pendidikan Umum",
-                            "45. Laporan Peningkatan Pendidikan",
-                            "46. Laporan Perkawinan Pertama/Kedua/Ketiga/Perceraian",
-                            "47. Laporan Kelahiran/Kematian Anak",
-                            "48. Surat Keterangan Pengangkatan Anak",
-                            "49. Surat lzin untuk Melangsungkan Perceraian",
-                            "50. Laporan Kematian Suami/ lstri",
-                            "51. Surat Keputusan Tanda Kehormatan dan Jasa",
-                            "52. Surat Keputusan Penyesuaian Gaji Pokok",
-                            "53. SK Penyesuaian Jabatan bagi PNS Jabatan Fungsional Tertentu",
-                            "54. Surat Keputusan Pengangkatan PNS dalam Pangkat Lokal",
-                            "55. Hasil Pendataan Ulang PNS Juli 2003",
-                            "56. Hasil Pendataan Ulang PNS Juli 2015",
-                            "57. Surat Keputusan Konversi NIP",
-                            "58. Surat Keputusan Meninggal Dunia",
-                            "59. Surat Keputusan Pemberhentian",
-                            "60. Surat Keputusan Kenaikan Pangkat Pengabdian",
-                            "61. Surat Keputusan Pensiun",
-                            "62. Daftar Riwayat Hidup",
-                            "63. Daftar Penilaian Prestasi Kerja",
-                            "64. Nota Pertimbangan Pemberian Pensiun",
-                            "65. Pangkalan Data",
-                            "66. DPCP",
-                            "67. Surat Tugas Belajar/Izin Belajar",
-                            "68. Uraian Tugas Jabatan",
-                        });
-                        */
-			cbFileType = new JComboBox();
-			getContentPane().add(cbFileType);
-			cbFileType.setModel(DocTypeModel);
-			cbFileType.setBounds(125, 43, 500, 22);
-                        AutoCompletion.enable(cbFileType);
-			
-			//cbUI = new JCheckBox(Messages.get("user.interface"), true);
-                        cbUI = new JCheckBox("Show Scanner Interface", false);
-			getContentPane().add(cbUI);
-			cbUI.setBounds(650, 43, 200, 22);
-			
+                        cbFileType = new JComboBox(JenisDokumenModel.getData());
+                        getContentPane().add(cbFileType);
+                        cbFileType.setEditable(true);
+                        cbFileType.setSelectedIndex(-1);
+                        JTextField field = (JTextField)cbFileType.getEditor().getEditorComponent();
+                        field.setText("");
+                        field.addKeyListener(new ComboKeyHandler(cbFileType));
+                        cbFileType.setBounds(125, 43, 650, 22);
+                 
 			bScan = new JButton();
 			getContentPane().add(bScan);
 			bScan.setText(Messages.get("scan.upload"));
@@ -232,6 +145,12 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 			bSelectScan.setText(Messages.get("select.scan"));
 			bSelectScan.setBounds(275, 84, 235, 22);
 			bSelectScan.addActionListener(this);
+                        
+                        bSetScan = new JButton();
+			getContentPane().add(bSetScan);
+			bSetScan.setText(Messages.get("set.scan"));
+			bSetScan.setBounds(525, 84, 235, 22);
+			bSetScan.addActionListener(this);
 			
 			pack();
 			this.setSize(850, 159);
@@ -243,28 +162,49 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
+               String fileName = tfFileName.getText().trim();
+	       String fileType = "pdf"; 
+               
+               if(ae.getSource()==bScan){
+                   
+                       
+                Item item = (Item) cbFileType.getModel().getSelectedItem();
+                System.out.println( item.getId() + " : " + item.getDescription() );
+                        
+                    if (fileName.length() > 0) {
+                        scanner.acquire(fileName,
+                           fileType.toLowerCase(),
+                           false,
+                           bScan,
+                           bSelectScan,
+                           bSetScan,
+                           tfFileName,
+                           cbFileType);
+		    } else {
+			JOptionPane.showMessageDialog(this,
+                                "File name cannot be empty",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+		    }
+                   
+                }else if(ae.getSource()==bSelectScan){
+                   try {
+                       scanner.selectScan();
+                   } catch (ScannerIOException ex) {
+                       Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+                }else{
+                    scanner.acquire(fileName,
+                            fileType.toLowerCase(),
+                            true,
+                            bScan,
+                            bSelectScan,
+                            bSetScan,
+                            tfFileName,
+                            cbFileType);
+		  
+                }
            
-            DocTypeModel item = (DocTypeModel) cbFileType.getModel().getSelectedItem();
-            System.out.println( item.getId() + " : " + item.getName() );
-            /*
-		
-            try {
-			String fileName = tfFileName.getText().trim();
-			String fileType = "";
-                        System.out.println(cbFileType.getModel());
-                        
-                        
-                        
-			if (fileName.length() > 0) {
-				scanner.acquire(fileName, fileType.toLowerCase(), cbUI.isSelected(), bScan, tfFileName, cbFileType, cbUI);
-			} else {
-				JOptionPane.showMessageDialog(this, "Empty file name", "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		} catch (ScannerIOException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		}
-            */
+            
 	}
 
 	@Override
@@ -275,7 +215,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	public void windowClosed(WindowEvent arg0) {
 		log.info("windowClosed: calling 'destroyScannerApplet'");
 		if (win != null) {
-			win.call("destroyScannerApplet", new Object[] {});
+			win.call("destroyScannerAppletFix", new Object[] {});
 		} else {
 			JOptionPane.showMessageDialog(null, "destroyScannerApplet", "JavaScript call",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -302,8 +242,5 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	public void windowOpened(WindowEvent arg0) {
 	}
 
-    private ActionListener createSearchActionListener(JComboBox<String> comboBox, DefaultComboBoxModel DocTypeModel) {
-            return null;
-       
-    }
+    
 }
