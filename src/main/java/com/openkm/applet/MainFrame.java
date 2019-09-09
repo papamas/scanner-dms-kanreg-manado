@@ -169,7 +169,10 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                    
                        
                 Item item = (Item) cbFileType.getModel().getSelectedItem();
-                System.out.println( item.getId() + " : " + item.getDescription() );
+                System.out.println( "id : " + item.getId() +
+                        " desc : " + item.getDescription() +
+                        " path : " + item.getPath() +  
+                        " file name : " + item.getFname());
                         
                     if (fileName.length() > 0) {
                         scanner.acquire(fileName,

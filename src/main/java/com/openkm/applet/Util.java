@@ -36,15 +36,19 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.HttpClient;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 public class Util {
 	private static Logger log = Logger.getLogger(Util.class.getName());
     
@@ -78,7 +82,41 @@ public class Util {
 			if (token != null) {
 				// Send image
                                 log.info("===Send image====");
-				HttpClient client = new DefaultHttpClient();
+                                CloseableHttpClient httpclient = HttpClients.createDefault();
+                                
+                                String message = "Post file from scanner direct";
+                                // build multipart upload request
+                                HttpEntity data = MultipartEntityBuilder.create()
+                                        .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                                        .addPart("file", new FileBody(tmpFile))
+                                        .addPart("path", new StringBody(path, Charset.forName("UTF-8")))
+                                        .addPart("action",new StringBody("0"))
+                                        .build();
+                                // build http request and assign multipart upload data
+                                HttpUriRequest request = RequestBuilder
+                                        .post(url + "/frontend/FileUpload;jsessionid=" + token)
+                                        .setEntity(data)
+                                        .build();
+                                System.out.println("Executing request " + request.getRequestLine());
+                                
+                                // Create a custom response handler
+                                ResponseHandler<String> responseHandler = respon -> {
+                                    int status = respon.getStatusLine().getStatusCode();
+                                    if (status >= 200 && status < 300) {
+                                        HttpEntity entity = respon.getEntity();
+                                        return entity != null ? EntityUtils.toString(entity) : null;
+                                    } else {
+                                        throw new ClientProtocolException("Unexpected response status: " + status);
+                                    }
+                                };
+                                String responseBody = httpclient.execute(request, responseHandler);
+                                System.out.println("----------------------------------------");
+                                System.out.println(responseBody);
+ 
+                               response = responseBody;
+ 
+				/*
+                                HttpClient client = new DefaultHttpClient();
 				MultipartEntity form = new MultipartEntity();
 				form.addPart("file", new FileBody(tmpFile));
 				form.addPart("path", new StringBody(path, Charset.forName("UTF-8")));
@@ -88,6 +126,7 @@ public class Util {
 				post.setEntity(form);
 				ResponseHandler<String> responseHandler = new BasicResponseHandler();
 				response = client.execute(post, responseHandler);
+                                */
 			} else {
 				// Store in disk
 				String home = System.getProperty("user.home");

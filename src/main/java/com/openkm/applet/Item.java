@@ -16,6 +16,7 @@ public class Item
     private String path;
     private String fname;
 
+    
     public Item(int id, String description, String path, String fname)
     {
         this.id = id;
@@ -23,7 +24,8 @@ public class Item
         this.path = path;
         this.fname = fname;
     }
-
+    
+   
     public int getId()
     {
         return id;
@@ -66,9 +68,7 @@ public class Item
 
     public String toString()
     {
-        return "{ id : " +  this.id +
-                 "description : " + description +
-                 "path   : " + this.path + 
-                 "file name : " + this.fname + "}";
+        return  description ;
+                
     }
 }
