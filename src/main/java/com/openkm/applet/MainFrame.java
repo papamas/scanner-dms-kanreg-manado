@@ -43,6 +43,13 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import uk.co.mmscomputing.device.scanner.ScannerIOException;
 import uk.co.mmscomputing.device.scanner.ScannerIOMetadata;
+import javax.swing.DefaultComboBoxModel;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MainFrame extends JFrame implements ActionListener, WindowListener {
 	private static Logger log = Logger.getLogger(MainFrame.class.getName());
@@ -63,6 +70,10 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	 * Auto-generated main method to display this JFrame
 	 */
 	public static void main(String[] args) {
+            new DatabaseHandler();
+      
+            
+              
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Messages.init(Locale.getDefault());
