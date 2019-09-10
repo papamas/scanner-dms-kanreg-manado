@@ -69,12 +69,9 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	/**
 	 * Auto-generated main method to display this JFrame
 	 */
-	public static void main(String[] args) {
-            new DatabaseHandler();
-      
-            
-              
-		SwingUtilities.invokeLater(new Runnable() {
+	public static void main(String[] args) throws SQLException {            
+	    	
+            SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Messages.init(Locale.getDefault());
 				MainFrame inst = new MainFrame(null, null);
