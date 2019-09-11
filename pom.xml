@@ -9,11 +9,11 @@
   <url>http://www.openkm.com</url>
   <description>Java applet used to scan document directly from OpenKM web interface.</description>
 
-  <scm>
-    <url>http://openkm.svn.sourceforge.net/viewvc/openkm/trunk</url>
-    <connection>scm:svn:https://openkm.svn.sourceforge.net/svnroot/openkm/trunk</connection>
-    <developerConnection>scm:svn:https://openkm.svn.sourceforge.net/svnroot/openkm/trunk</developerConnection>
-  </scm>
+ <scm>
+    <url>https://github.com/papamas/scanner-dms-kanreg-manado</url>
+    <connection>scm:git:git://github.com/papamas/scanner-dms-kanreg-manado.git</connection>
+    <developerConnection>scm:git:git@github.com:papamas/scanner-dms-kanreg-manado.git</developerConnection>
+</scm>
 
   <licenses>
     <license>
@@ -22,19 +22,14 @@
     </license>
   </licenses>
 
-  <developers>
+ <developers>
     <developer>
-      <id>monkiki</id>
-      <name>Paco Avila</name>
-      <email>monkiki@gmail.com</email>
-      <url>http://monkiki.wordpress.com</url>
-      <timezone>+1</timezone>
-      <roles>
-        <role>manager</role>
-        <role>developer</role>
-      </roles>
+        <email>nholik1205@gmail.com</email>
+        <name>Nur Muhamad Holik</name>
+        <url>https://github.com/papamas</url>
+        <id>papamas</id>
     </developer>
-  </developers>
+</developers>
 
   <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

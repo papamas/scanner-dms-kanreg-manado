@@ -113,6 +113,10 @@ public class ScannerManager implements ScannerListener {
 	public void setPath(String path) {
             this.path = path;
 	}
+        
+        public String getPath() {
+            return path;
+	}
 
 	@Override
 	public void update(Type type, ScannerIOMetadata metadata) {

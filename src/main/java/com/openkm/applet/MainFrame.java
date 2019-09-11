@@ -113,7 +113,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 
 			jLabel1 = new JLabel();
 			getContentPane().add(jLabel1);
-			jLabel1.setText(Messages.get("doc.name"));                        
+			jLabel1.setText(Messages.get("doc.tmt"));                        
 			jLabel1.setBounds(19, 19, 105, 15);
 			
 			jLabel2 = new JLabel();
@@ -130,12 +130,9 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                         cbFileType = new JComboBox(JenisDokumenModel.getData());
                         getContentPane().add(cbFileType);
                         cbFileType.setEditable(true);
-                        cbFileType.setSelectedIndex(-1);
                         JTextField field = (JTextField)cbFileType.getEditor().getEditorComponent();
-                        field.setText("");
                         field.addKeyListener(new ComboKeyHandler(cbFileType));
-                        cbFileType.setBounds(125, 43, 650, 22);
-                 
+                        cbFileType.setBounds(125, 43, 650, 22);                 
 			bScan = new JButton();
 			getContentPane().add(bScan);
 			bScan.setText(Messages.get("scan.upload"));
@@ -164,20 +161,22 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-               String fileName = tfFileName.getText().trim();
-	       String fileType = "pdf"; 
-               
-               if(ae.getSource()==bScan){
-                   
-                       
-                Item item = (Item) cbFileType.getModel().getSelectedItem();
-                System.out.println( "id : " + item.getId() +
-                        " desc : " + item.getDescription() +
-                        " path : " + item.getPath() +  
-                        " file name : " + item.getFname());
-                        
+            String fileName = tfFileName.getText().trim();
+            String fileType = "pdf"; 
+            String path   =  this.scanner.getPath();
+            int index = path.lastIndexOf('/');
+            String nip = path.substring(index +1);       
+
+            if(nip.startsWith("19") && nip.length() == 18){
+                if(ae.getSource()==bScan){                      
+                    Item item = (Item) cbFileType.getModel().getSelectedItem();
+                    System.out.println( "id : " + item.getId() +
+                            " desc : " + item.getDescription() +
+                            " path : " + item.getPath() +  
+                            " file name : " + item.getFname());
+                  
                     if (fileName.length() > 0) {
-                        scanner.acquire(fileName,
+                        scanner.acquire(item.getFname()+"_"+nip+"_"+fileName,
                            fileType.toLowerCase(),
                            false,
                            bScan,
@@ -187,7 +186,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                            cbFileType);
 		    } else {
 			JOptionPane.showMessageDialog(this,
-                                "File name cannot be empty",
+                                "TMT Dokumen Tidak Boleh Kosong",
                                 "Error", JOptionPane.ERROR_MESSAGE);
 		    }
                    
@@ -207,7 +206,14 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                             tfFileName,
                             cbFileType);
 		  
-                }
+                }   
+            }else{
+                JOptionPane.showMessageDialog(this,
+                            "Dokumen hanya boleh di Scan pada Folder NIP",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+            }
+                
+               
            
             
 	}
