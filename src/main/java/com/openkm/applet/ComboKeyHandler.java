@@ -35,11 +35,7 @@ public class ComboKeyHandler implements KeyListener {
             list.addElement(new Item(item.getId(),item.getDescription(),item.getPath(),item.getFname()));
         }
     }
-
-    
-    
- 
-    
+  
     @Override
     public void keyTyped(final KeyEvent e) {
         EventQueue.invokeLater(new Runnable() {

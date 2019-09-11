@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package com.openkm.applet;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 
 /**
  *
@@ -21,22 +22,49 @@ public class DatabaseHandler {
     
     private  Connection c = null;
     private  Statement stmt = null;
-    private  String Insert_sql = "INSERT INTO DOKUMEN (DESCRIPTION, PATH, FNAME) values (?, ?, ?)";
-    private  String Select_sql = "SELECT ID,DESCRIPTION, PATH, FNAME FROM DOKUMEN";
-    private  String Drop_sql   = "DROP TABLE IF EXISTS DOKUMEN;";
+    private final  String Insert_sql = "INSERT INTO DOKUMEN (DESCRIPTION, PATH, FNAME) values (?, ?, ?)";
+    private final  String Select_sql = "SELECT ID,DESCRIPTION, PATH, FNAME FROM DOKUMEN";
+    private final  String Drop_sql   = "DROP TABLE IF EXISTS DOKUMEN;";
+    private final  String Check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='DOKUMEN'";
+    private final  File tmpDir;
    
+    
+    public DatabaseHandler() throws IOException, SQLException{
+        
+        this.tmpDir = createTempDir();
+        connect();
+        if(!checkTable()){
+            createTable();
+            insertTable();
+        }
+    }
     
     public Connection connect(){
         try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:dokumen.db");
+            Class.forName("org.sqlite.JDBC");            
+            System.out.println(tmpDir.getCanonicalPath());
+            c = DriverManager.getConnection("jdbc:sqlite:"+tmpDir.getCanonicalPath() + "\\dokumen.db");
+            System.out.println("Opened database successfully");            
         } 
         catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );          
         }
-        System.out.println("Opened database successfully");
-
         return c;
+    }
+    
+    public boolean checkTable() throws SQLException{
+        stmt = c.createStatement();
+        ResultSet rs    = stmt.executeQuery(Check_sql);
+        if (rs.next()) {
+            System.out.println(rs.getString("name"));
+            boolean ok = (rs.getInt(1) == 0);            
+            if (ok) {
+                return true;
+            }
+
+        }
+       stmt.close();
+       return false;
     }
     
     public void createTable(){
@@ -59,7 +87,7 @@ public class DatabaseHandler {
     public void insertTable() throws SQLException{
        PreparedStatement pstmt = c.prepareStatement(Insert_sql);
        c.setAutoCommit(false);
-       DefaultComboBoxModel model  = JenisDokumenModel.getData();
+       DefaultComboBoxModel model  = JenisDokumenModel.getDefaultModel();
        for(int i=0;i< model.getSize();i++) {
             Item item = (Item) model.getElementAt(i);            
             pstmt.setString(1,item.getDescription());
@@ -96,8 +124,7 @@ public class DatabaseHandler {
     
     public void dropTable() throws SQLException{
         stmt = c.createStatement();
-        stmt.executeUpdate(Drop_sql);    
-       
+        stmt.executeUpdate(Drop_sql);        
    
     }
     
@@ -105,4 +132,19 @@ public class DatabaseHandler {
         stmt.close();
         c.close();
     }
+    
+    public static File createTempDir() throws IOException {
+        String temp_folder = System.getProperty("java.io.tmpdir") + "okmApplet";
+        File file = new File(temp_folder);
+
+        if (!file.exists()) {
+            if (file.mkdir()) {
+                System.out.println("Directory is created!");
+            } else {
+                System.out.println("Failed to create directory!");
+            }
+        }
+        
+            return file;       
+	}
 }
