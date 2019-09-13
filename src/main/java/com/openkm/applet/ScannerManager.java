@@ -59,6 +59,7 @@ public class ScannerManager implements ScannerListener {
 	private JComboBox cbFileType;
 	private List<BufferedImage> images;
         private boolean ui;
+        private String folder;
 
 	/**
 	 * @param token
@@ -71,6 +72,7 @@ public class ScannerManager implements ScannerListener {
 		log.info("########## ScannerManager ##########");
 		this.token = token;
 		this.path = path;
+                this.folder = folder;
 		this.url = url;
 		this.win = win;
 		images = new ArrayList<BufferedImage>();
@@ -79,7 +81,8 @@ public class ScannerManager implements ScannerListener {
                
 	}
 	      
-     	public void acquire(String fileName,
+     	public void acquire(String folder, 
+                String fileName,
                 String fileType,
                 boolean ui,
                 JButton bScan,
@@ -87,8 +90,10 @@ public class ScannerManager implements ScannerListener {
                 JButton bSetScan,
                 JTextField tfFileName,
                 JComboBox cbFileType) {
-		
+		System.out.println(folder);
+                
                 log.fine("########## acquire ########## " + fileName + " -> " + fileType);
+                this.folder = folder;
 		this.bScan = bScan;
                 this.bSelectScan = bSelectScan;
                 this.bSetScan = bSetScan;
@@ -130,25 +135,16 @@ public class ScannerManager implements ScannerListener {
 			
 			if (metadata.getLastState() == 7 && metadata.getState() == 5) {
 				try {
-					String response = Util.createDocument(token, 
+					Util.createDocument(token,
+                                                folder, 
                                                 path,
                                                 fileName,
                                                 fileType, 
                                                 url,
                                                 images);
+                                                                       
                                         
-                                        log.info("=== Response Create Document===" + response);
-                                        
-                                        JSONParser parser = new JSONParser();
-                                        JSONObject jsonObject = (JSONObject) parser.parse(response);
-                                        String error = (String) jsonObject.get("error");
-                                        					
-					if (response.contains("OKM")) {
-					    log.log(Level.SEVERE, "Error: " + response);
-					    ErrorCode.displayError(error, path + "/" + fileName + "." + fileType);
-                                            
-                                            
-					}
+                                       
 					
 					images.clear();
 					win.call("refreshFolderFix", null);
@@ -215,9 +211,6 @@ public class ScannerManager implements ScannerListener {
 			log.finer("update(" + type + ", " + metadata + ")");
 		}
 	}
-
-   
-
     void selectScan() throws ScannerIOException {
         log.info("***** CALL SELECT SCANNER *****");
         scanner.select();

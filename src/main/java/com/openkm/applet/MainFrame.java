@@ -27,6 +27,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +47,7 @@ import javax.swing.JTextField;
 import uk.co.mmscomputing.device.scanner.ScannerIOException;
 import uk.co.mmscomputing.device.scanner.ScannerIOMetadata;
 import java.sql.SQLException;
+import java.util.List;
 
 public class MainFrame extends JFrame implements ActionListener, WindowListener {
 	private static Logger log = Logger.getLogger(MainFrame.class.getName());
@@ -58,7 +62,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	private JSObject win;
         private JButton bSelectScan;
         private JButton bSetScan;
-
+        private String folder;
         private ScannerIOMetadata metadata;
 	/**
 	 * Auto-generated main method to display this JFrame
@@ -165,18 +169,141 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
             String fileType = "pdf"; 
             String path   =  this.scanner.getPath();
             int index = path.lastIndexOf('/');
-            String nip = path.substring(index +1);       
-
+            String nip = path.substring(index +1);
+            
             if(nip.startsWith("19") && nip.length() == 18){
                 if(ae.getSource()==bScan){                      
-                    Item item = (Item) cbFileType.getModel().getSelectedItem();
-                    System.out.println( "id : " + item.getId() +
-                            " desc : " + item.getDescription() +
-                            " path : " + item.getPath() +  
-                            " file name : " + item.getFname());
-                  
+                    Item item = (Item) cbFileType.getModel().getSelectedItem(); 
+                    folder    = item.getPath();
+                    int id    = item.getId();                  
+                    
                     if (fileName.length() > 0) {
-                        scanner.acquire(item.getFname()+"_"+nip+"_"+fileName,
+
+                         switch (id){
+                        case 1:
+                            fileName = "";
+                        break;
+                        case 2:
+                            fileName = "";
+                        break; 
+                        case 3:
+                            fileName = "";
+                        break; 
+                        case 4:
+                            fileName = "";
+                        break;
+                        case 5:
+                            fileName = "";
+                        break;
+                        case 6:
+                            fileName = "";
+                        break;
+                        case 8:
+                            fileName = "";
+                        break;
+                        case 9:
+                            fileName = "";
+                        break;
+                        case 10:
+                            fileName = "";
+                        break;
+                        case 38:
+                            fileName = "";
+                        break;
+                        case 39:
+                            fileName = "";
+                        break;
+                        case 40:
+                            fileName = "";
+                        break;
+                        case 49:
+                            fileName = "";
+                        break;
+                        case 50:
+                            fileName = "";
+                        break;
+                        case 51:
+                            fileName = "";
+                        break;
+                        case 52:
+                            fileName = "";
+                        break;
+                        case 53:
+                            fileName = "";
+                        break;
+                        case 54:
+                            fileName = "";
+                        break;
+                        case 65:
+                            fileName = "";
+                        break;
+                        case 66:
+                            fileName = "";
+                        break;
+                        case 67:
+                            fileName = "";
+                        break;
+                        case 68:
+                            fileName = "";
+                        break;
+                        case 69:
+                            fileName = "";
+                        break;
+                        case 70:
+                            fileName = "";
+                        break;
+                        case 71:
+                            fileName = "";
+                        break;
+                        case 74:
+                            fileName = "";
+                        break;
+                        case 76:
+                            fileName = "";
+                        break;
+                        case 79:
+                            fileName = "";
+                        break;
+                        case 81:
+                            fileName = "";
+                        break;
+                        case 82:
+                            fileName = "";
+                        break;
+                        case 83:
+                            fileName = "";
+                        break;
+                        case 84:
+                            fileName = "";
+                        break;
+                        case 85:
+                            fileName = "";
+                        break;
+                        case 87:
+                            fileName = "";
+                        break;
+                        case 88:
+                            fileName = "";
+                        break;
+                        case 89:
+                            fileName = "";
+                        break;
+                        case 90:
+                            fileName = "";
+                        break;
+                        case 91:
+                            fileName = "";
+                        break;
+                        case 92:
+                            fileName = "";
+                        break;
+                        case 93:
+                            fileName = "";
+                        break;
+                        default:
+                            fileName = "_"+fileName;
+                    }
+                        scanner.acquire(folder, item.getFname()+"_"+nip+fileName,
                            fileType.toLowerCase(),
                            false,
                            bScan,
@@ -197,7 +324,8 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                    }
                 }else{
-                    scanner.acquire(fileName,
+                    scanner.acquire(folder,
+                            fileName,
                             fileType.toLowerCase(),
                             true,
                             bScan,
@@ -211,10 +339,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                 JOptionPane.showMessageDialog(this,
                             "Dokumen hanya boleh di Scan pada Folder NIP",
                             "Error", JOptionPane.ERROR_MESSAGE);
-            }
-                
-               
-           
+            }          
             
 	}
 
@@ -252,6 +377,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
 	@Override
 	public void windowOpened(WindowEvent arg0) {
 	}
-
+        
+       
     
 }

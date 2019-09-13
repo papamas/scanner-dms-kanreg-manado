@@ -26,12 +26,12 @@ public class DatabaseHandler {
     private final  String Select_sql = "SELECT ID,DESCRIPTION, PATH, FNAME FROM DOKUMEN";
     private final  String Drop_sql   = "DROP TABLE IF EXISTS DOKUMEN;";
     private final  String Check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='DOKUMEN'";
-    private final  File tmpDir;
+    private final  File Dir;
    
     
     public DatabaseHandler() throws IOException, SQLException{
         
-        this.tmpDir = createTempDir();
+        this.Dir = createDir();
         connect();
         if(!checkTable()){
             createTable();
@@ -42,9 +42,8 @@ public class DatabaseHandler {
     public Connection connect(){
         try {
             Class.forName("org.sqlite.JDBC");            
-            System.out.println(tmpDir.getCanonicalPath());
-            c = DriverManager.getConnection("jdbc:sqlite:"+tmpDir.getCanonicalPath() + "\\dokumen.db");
-            System.out.println("Opened database successfully");            
+            System.out.println(Dir.getCanonicalPath());
+            c = DriverManager.getConnection("jdbc:sqlite:"+Dir.getCanonicalPath() + "\\dokumen.db");                    
         } 
         catch ( Exception e ) {
             System.err.println( e.getClass().getName() + ": " + e.getMessage() );          
@@ -133,7 +132,7 @@ public class DatabaseHandler {
         c.close();
     }
     
-    public static File createTempDir() throws IOException {
+    public static File createDir() throws IOException {
         String temp_folder = System.getProperty("java.io.tmpdir") + "okmApplet";
         File file = new File(temp_folder);
 

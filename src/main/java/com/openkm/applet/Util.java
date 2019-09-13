@@ -30,25 +30,35 @@ import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
-
 import org.apache.commons.io.FileUtils;
+
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 public class Util {
 	private static Logger log = Logger.getLogger(Util.class.getName());
     
@@ -56,15 +66,24 @@ public class Util {
 	 * Upload scanned document to OpenKM
 	 * 
 	 */
-	public static String createDocument(String token, String path, String fileName, String fileType,
-			String url, List<BufferedImage> images) throws MalformedURLException, IOException {
-		log.info("createDocument(" + token + ", " + path + ", " + fileName + ", " + fileType +
+	public static void createDocument(String token,String folder, String path, String fileName, String fileType,
+			String url, List<BufferedImage> images) throws MalformedURLException, IOException, ParseException {
+		log.info("createDocument(" + token + ", " + folder + ", " + path + ", " + fileName + ", " + fileType +
 				", " + url + ", " + images + ")");
 		File tmpDir = createTempDir();
-		File tmpFile = new File(tmpDir, fileName + "." + fileType);
+                
+                File file = new File(tmpDir + "/" + folder);
+                if (!file.exists()) {
+                    if (file.mkdir()) {
+                        System.out.println("Directory is created!");
+                    } else {
+                        System.out.println("Failed to create directory!");
+                    }
+                }
+		File tmpFile = new File(tmpDir + "/" + folder, fileName + "." + fileType);
 		ImageOutputStream ios = ImageIO.createImageOutputStream(tmpFile);
 		String response = "";
-		
+                          
 		try {
 			if ("pdf".equals(fileType)) {
 				ImageUtils.writePdf(images, ios);
@@ -78,68 +97,20 @@ public class Util {
 			
 			ios.flush();
 			ios.close();
+                        
+                        // Store in disk
+                        String home = System.getProperty("user.home");
+                        File dst = new File(home, tmpFile.getName());
+                        copyFile(tmpFile, dst);
+                         
 			
-			if (token != null) {
-				// Send image
-                                log.info("===Send image====");
-                                CloseableHttpClient httpclient = HttpClients.createDefault();
-                                
-                                String message = "Post file from scanner direct";
-                                // build multipart upload request
-                                HttpEntity data = MultipartEntityBuilder.create()
-                                        .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                                        .addPart("file", new FileBody(tmpFile))
-                                        .addPart("path", new StringBody(path, Charset.forName("UTF-8")))
-                                        .addPart("action",new StringBody("0"))
-                                        .build();
-                                // build http request and assign multipart upload data
-                                HttpUriRequest request = RequestBuilder
-                                        .post(url + "/frontend/FileUpload;jsessionid=" + token)
-                                        .setEntity(data)
-                                        .build();
-                                System.out.println("Executing request " + request.getRequestLine());
-                                
-                                // Create a custom response handler
-                                ResponseHandler<String> responseHandler = respon -> {
-                                    int status = respon.getStatusLine().getStatusCode();
-                                    if (status >= 200 && status < 300) {
-                                        HttpEntity entity = respon.getEntity();
-                                        return entity != null ? EntityUtils.toString(entity) : null;
-                                    } else {
-                                        throw new ClientProtocolException("Unexpected response status: " + status);
-                                    }
-                                };
-                                String responseBody = httpclient.execute(request, responseHandler);
-                                System.out.println("----------------------------------------");
-                                System.out.println(responseBody);
- 
-                               response = responseBody;
- 
-				/*
-                                HttpClient client = new DefaultHttpClient();
-				MultipartEntity form = new MultipartEntity();
-				form.addPart("file", new FileBody(tmpFile));
-				form.addPart("path", new StringBody(path, Charset.forName("UTF-8")));
-				form.addPart("action", new StringBody("0")); // FancyFileUpload.ACTION_INSERT
-				HttpPost post = new HttpPost(url + "/frontend/FileUpload;jsessionid=" + token);
-				post.setHeader("Cookie", "jsessionid=" + token);
-				post.setEntity(form);
-				ResponseHandler<String> responseHandler = new BasicResponseHandler();
-				response = client.execute(post, responseHandler);
-                                */
-			} else {
-				// Store in disk
-				String home = System.getProperty("user.home");
-				File dst = new File(home, tmpFile.getName());
-				copyFile(tmpFile, dst);
-				response = "Image copied to " + dst.getPath(); 
-			}
 		} finally {
-			FileUtils.deleteQuietly(tmpDir);
+                    displayDirectoryContents(token, path,folder, url,tmpDir);
+		    FileUtils.deleteQuietly(tmpDir);
 		}
 		
 		log.info("createDocument: "+response);
-		return response;
+		//return response;
 	}
 	
 	/**
@@ -176,7 +147,7 @@ public class Util {
 	 * Copy file
 	 */
 	private static void copyFile(File fromFile, File toFile) throws IOException {
-		FileInputStream from = null;
+	    FileInputStream from = null;
 	    FileOutputStream to = null;
 	    
 	    try {
@@ -202,4 +173,112 @@ public class Util {
 	    	}
 	    }
 	}
+        
+        /**
+	 * Call to create document
+	 */
+	public static String createDoc(String token, String path, String url, File file) throws IOException {
+		log.info("createDoc(" + token + ", " + path + ", " + url + ", " + file.getAbsolutePath() + ")");
+		CloseableHttpClient httpclient = HttpClients.createDefault();             
+                // build multipart upload request
+                HttpEntity data = MultipartEntityBuilder.create()
+                        .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                        .addPart("file",new FileBody(file, ContentType.DEFAULT_BINARY))
+                        .addPart("path", new StringBody(path, Charset.forName("UTF-8")))
+                        .addPart("action",new StringBody("0"))
+                        .build();
+                // build http request and assign multipart upload data
+                HttpUriRequest request = RequestBuilder
+                        .post(url + "/frontend/FileUpload;jsessionid=" + token)
+                        .setEntity(data)
+                        .build();
+
+                // Create a custom response handler
+                ResponseHandler<String> responseHandler = respon -> {
+                    int status = respon.getStatusLine().getStatusCode();
+                    if (status >= 200 && status < 300) {
+                        HttpEntity entity = respon.getEntity();
+                        return entity != null ? EntityUtils.toString(entity) : null;
+                    } else {
+                        throw new ClientProtocolException("Unexpected response status: " + status);
+                    }
+                };
+                String responseBody = httpclient.execute(request, responseHandler);
+                String response = responseBody;
+		log.info("createDocument: " + response);
+		return response;
+	}
+        /**
+	 * Call to create folder
+	 */
+	public static String createFolder(String token, String path, String url, File file) throws IOException {
+		log.info("createFolder(" + token + ", " + path + ", " + url + ", " + file + ")");
+                
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                // build multipart upload request
+                HttpEntity data = MultipartEntityBuilder.create()
+                       .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                       .addPart("folder", new StringBody(file.getName()))
+                       .addPart("path", new StringBody(path, Charset.forName("UTF-8")))
+                       .addPart("action",new StringBody("2"))
+                       .build();
+                // build http request and assign multipart upload data
+                HttpUriRequest request = RequestBuilder
+                       .post(url + "/frontend/FileUpload;jsessionid=" + token)
+                       .setEntity(data)
+                       .build();
+                // Create a custom response handler
+                ResponseHandler<String> responseHandler = respon -> {
+                    int status = respon.getStatusLine().getStatusCode();
+                    if (status >= 200 && status < 300) {
+                        HttpEntity entity = respon.getEntity();
+                        return entity != null ? EntityUtils.toString(entity) : null;
+                    } else {
+                        throw new ClientProtocolException("Unexpected response status: " + status);
+                    }
+                };
+                String responseBody = httpclient.execute(request, responseHandler);
+                System.out.println("----------------------------------------");
+                System.out.println(responseBody); 
+                String response = responseBody;                                
+		log.info("createFolder: " + response);
+		return response;
+	}
+        
+    public static void displayDirectoryContents(String token, String path,String folder,String url,File dir) throws ParseException {
+        try {
+                File[] files = dir.listFiles();     
+                String response;
+                for (File file : files) {
+                        if (file.isDirectory()) {
+                            log.info("== create folder=="+ token + "," + path + "," + url + "," + file.getName());
+                            
+                            response = createFolder(token, path, url, file);
+                            displayDirectoryContents(token, path,folder,url, file);
+                        } else {
+                            log.info("== create file=="+ token + "," + path+","+folder+ "," + url + "," + file.getName());
+                            response = createDoc(token, path +"/"+folder,url, file);    
+                            
+                            log.info("=== Response displayDirectoryContents===" + response);
+                                        
+                            JSONParser parser = new JSONParser();
+                            JSONObject jsonObject = (JSONObject) parser.parse(response);
+                            String error = (String) jsonObject.get("error");
+
+                            if (response.contains("OKM")) {
+                                log.log(Level.SEVERE, "Error: " + response);
+                                ErrorCode.displayError(error, file.getName());
+
+
+                            }    
+                        }
+                        
+                       
+                }
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
+    }    
+
+    
 }
