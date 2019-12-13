@@ -36,7 +36,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.compiler>1.8</java.compiler>
-        <java.home>C:\Program Files\Java\jdk1.8.0_102\jre\lib\plugin.jar</java.home>
+        <java.home>C:\Program Files\Java\jdk1.8.0_221\jre\lib\plugin.jar</java.home>
   </properties>
 
   <dependencies>
