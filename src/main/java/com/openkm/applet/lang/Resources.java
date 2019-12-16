@@ -35,7 +35,7 @@ public class Resources extends ListResourceBundle {
                         { "doc.name", "Nama Dokumen"},
                         { "select.scan", "Select Scanner"},
                         { "set.scan", "Setting Scanner"},
-                        { "doc.tmt", "TMT Dokumen"}
+                        { "doc.tmt", "TMT/Kode/Minor"}
 		};
 	}
 }

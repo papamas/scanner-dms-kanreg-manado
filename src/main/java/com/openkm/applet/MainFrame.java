@@ -27,9 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +44,6 @@ import javax.swing.JTextField;
 import uk.co.mmscomputing.device.scanner.ScannerIOException;
 import uk.co.mmscomputing.device.scanner.ScannerIOMetadata;
 import java.sql.SQLException;
-import java.util.List;
 
 public class MainFrame extends JFrame implements ActionListener, WindowListener {
 	private static Logger log = Logger.getLogger(MainFrame.class.getName());
@@ -179,10 +175,8 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                     
                     if (fileName.length() > 0) {
 
-                         switch (id){
-                        case 1:
-                            fileName = "";
-                        break;
+                        switch (id){                             
+                        // remove underscore after nip     
                         case 2:
                             fileName = "";
                         break; 
@@ -197,10 +191,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                         break;
                         case 6:
                             fileName = "";
-                        break;
-                        case 8:
-                            fileName = "";
-                        break;
+                        break;                       
                         case 9:
                             fileName = "";
                         break;
@@ -255,13 +246,28 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                         case 71:
                             fileName = "";
                         break;
+                        case 72:
+                            fileName = "";
+                        break;
                         case 74:
+                            fileName = "";
+                        break;
+                        case 75:
                             fileName = "";
                         break;
                         case 76:
                             fileName = "";
                         break;
+                        case 77:
+                            fileName = "";
+                        break;
+                        case 78:
+                            fileName = "";
+                        break;
                         case 79:
+                            fileName = "";
+                        break;
+                        case 80:
                             fileName = "";
                         break;
                         case 81:
@@ -277,6 +283,9 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                             fileName = "";
                         break;
                         case 85:
+                            fileName = "";
+                        break;
+                        case 86:
                             fileName = "";
                         break;
                         case 87:
@@ -300,6 +309,36 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                         case 93:
                             fileName = "";
                         break;
+                        case 94:
+                            fileName = "";
+                        break;
+                        case 95:
+                            fileName = "";
+                        break;
+                        case 96:
+                            fileName = "";
+                        break;
+                        case 97:
+                            fileName = "";
+                        break;
+                        case 98:
+                            fileName = "";
+                        break;
+                        case 103:
+                            fileName = "";
+                        break;
+                        case 104:
+                            fileName = "";
+                        break;
+                        case 105:
+                            fileName = "";
+                        break;
+                        case 106:
+                            fileName = "";
+                        break;
+                        case 107:
+                            fileName = "";
+                        break;
                         default:
                             fileName = "_"+fileName;
                     }
@@ -313,7 +352,7 @@ public class MainFrame extends JFrame implements ActionListener, WindowListener 
                            cbFileType);
 		    } else {
 			JOptionPane.showMessageDialog(this,
-                                "TMT Dokumen Tidak Boleh Kosong",
+                                "TMT/Kode/Minor Tidak Boleh Kosong",
                                 "Error", JOptionPane.ERROR_MESSAGE);
 		    }
                    

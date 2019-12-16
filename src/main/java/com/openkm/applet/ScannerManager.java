@@ -42,8 +42,6 @@ import uk.co.mmscomputing.device.scanner.ScannerIOMetadata;
 import uk.co.mmscomputing.device.scanner.ScannerIOMetadata.Type;
 import uk.co.mmscomputing.device.scanner.ScannerListener;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 public class ScannerManager implements ScannerListener {
 	private static Logger log = Logger.getLogger(ScannerManager.class.getName());
